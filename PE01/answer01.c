@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "answer01.h"
-
+/*checking if it works */
 /* Return the largest partial sum of the array */
 /* int array[] = { 1, 4, -1, 6, -5, 4} */
 /* the ith partial sum is the sum from array[0] through array[i] */
