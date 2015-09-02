@@ -18,7 +18,7 @@ void printArray(int * array, int len)
     // inject error
     // change "ind < len" to "ind <= len" for your valgrind output
 
-    for(ind = 0; ind < len; ++ind) {
+    for(ind = 0; ind <= len; ++ind) {
 	printf("%d", array[ind]);
 	if(ind != len - 1) {
 	    printf(", ");
