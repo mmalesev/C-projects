@@ -7,18 +7,12 @@
 
 #include "answer01.h"
 
-// Modify this function to generate memcheck.log.2 
-// Undo the changes after you have generated the log file
-
 void printArray(int * array, int len)
 {
     printf("{");
     int ind;
 
-    // inject error
-    // change "ind < len" to "ind <= len" for your valgrind output
-
-    for(ind = 0; ind <= len; ++ind) {
+    for(ind = 0; ind < len; ++ind) {
 	printf("%d", array[ind]);
 	if(ind != len - 1) {
 	    printf(", ");
@@ -139,22 +133,54 @@ void test_00_largest_partial_sum()
     int len4 = 4;
     test_largest_partial_sum(array4, len4, -1);
 
+    int array5[] = { -1, 13, 0, 0, -2, -3, -4 };
+    int len5 = 7;
+    test_largest_partial_sum(array5, len5, 12);
+
     // You can add more test-cases here
     // ...
 
     printf("\n"); // Tidy output is easier to use
 }
 
-// you may want to write your own test function
+// test function for largest_difference
 //
+void test_largest_difference(int * array, int len, int expected)
+{
+    printArray(array, len);
+    int diff = largest_difference(array, len);
+    printf(". difference = %d, expected = %d.", diff, expected);
+    if(diff != expected)
+	printf(" FAIL");
+    printf("\n");
+}
+
 void test_01_largest_difference()
 {
     printf("Testing largest_difference(...)\n");
-    // write your own test function
-
-    // ...
-
     printf("\n");
+
+    // Here we use "static initialization" to create an array
+    int array1[] = { -4, -1, 0, 1, 5, 10, 20, 21 };
+    int len1 = 8;
+    test_largest_difference(array1, len1, 25);
+
+    // Our functions must always work... even on empty arrays
+    int array2[] = {};
+    int len2 = 0;
+    test_largest_difference(array2, len2, 0);
+
+    int array3[] = { 1, 4, -1, 6, -5, 4}; 
+    int len3 = 6;
+    test_largest_difference(array3, len3, 11);
+
+    int array4[] = { -1, -2, -3, -4 };
+    int len4 = 4;
+    test_largest_difference(array4, len4, 3);
+    
+    int array5[] = { -1, 13, 0, 0, -2, -3, -4 };
+    int len5 = 7;
+    test_largest_difference(array5, len5, 17);
 }
 
 // fill in statements to call largest_partial_sum or largest_difference
@@ -169,11 +195,11 @@ int main(int argc, char * * argv)
     	test_00_largest_partial_sum();
     	test_01_largest_difference();
 
-    } else { // now, try to parse the arguments and call the correct function
+    } else { 
 
-	int return_value = 0;
-	int *array = NULL;
-	int len = 0;
+	    int return_value = 0;
+	    int *array = NULL;
+	    int len = 9;
 
         // fill in the correct statements to complete the main function
 	// we expect two arguments:
@@ -195,14 +221,19 @@ int main(int argc, char * * argv)
         if (argc == 3) {
 	    array = read_in_Array(argv[2], &len); 
 	    printArray(array, len);
-	} else {
-	    return EXIT_FAILURE;
-	} 
+	    }   
+        else {
+	        return EXIT_FAILURE;
+        }
 
         // fill in the rest of the statements here
         // so that the correct function is called based on the first argument
-   
-
+        if (atoi(argv[1]) == 0){
+            return_value = largest_partial_sum(array, len);
+        }
+        else if (atoi(argv[1]) == 1){
+            return_value = largest_difference(array, len);
+        }
 
 
 
