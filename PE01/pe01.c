@@ -1,10 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-// The following include statement includes the /definitions/ of the 
-// functions that you have to write in this assignment. Including 
-// the definitions allows you to use the functions in this file.
-
 #include "answer01.h"
 
 void printArray(int * array, int len)
@@ -19,13 +14,9 @@ void printArray(int * array, int len)
 	}
     }
     printf("}");
-    // If we don't include a '\n' character, then we need to 
-    // include this line to ensure that our output is immediately
-    // printed out output.
     fflush(stdout); 
 }
 
-// Do not modify this function
 // Given a filename, this function reads the entries in the file 
 // into an array, and returns the array and the size of the array
 // the file is assumed to store only numbers.
@@ -115,12 +106,10 @@ void test_00_largest_partial_sum()
 {
     printf("Testing largest_partial_sum(...)\n");
 
-    // Here we use "static initialization" to create an array
     int array1[] = { -4, -1, 0, 1, 5, 10, 20, 21 };
     int len1 = 8;
     test_largest_partial_sum(array1, len1, 52);
 
-    // Our functions must always work... even on empty arrays
     int array2[] = {};
     int len2 = 0;
     test_largest_partial_sum(array2, len2, 0);
@@ -137,9 +126,6 @@ void test_00_largest_partial_sum()
     int len5 = 7;
     test_largest_partial_sum(array5, len5, 12);
 
-    // You can add more test-cases here
-    // ...
-
     printf("\n"); // Tidy output is easier to use
 }
 
@@ -155,17 +141,16 @@ void test_largest_difference(int * array, int len, int expected)
     printf("\n");
 }
 
+//test function for largest_difference
 void test_01_largest_difference()
 {
     printf("Testing largest_difference(...)\n");
     printf("\n");
 
-    // Here we use "static initialization" to create an array
     int array1[] = { -4, -1, 0, 1, 5, 10, 20, 21 };
     int len1 = 8;
     test_largest_difference(array1, len1, 25);
 
-    // Our functions must always work... even on empty arrays
     int array2[] = {};
     int len2 = 0;
     test_largest_difference(array2, len2, 0);
@@ -183,9 +168,6 @@ void test_01_largest_difference()
     test_largest_difference(array5, len5, 17);
 }
 
-// fill in statements to call largest_partial_sum or largest_difference
-// depending on the first input argument
-//
 int main(int argc, char * * argv)
 {
     printf("Welcome to ECE264, we are working on PE01.\n\n");
@@ -196,12 +178,10 @@ int main(int argc, char * * argv)
     	test_01_largest_difference();
 
     } else { 
-
 	    int return_value = 0;
 	    int *array = NULL;
 	    int len = 9;
 
-        // fill in the correct statements to complete the main function
 	// we expect two arguments:
 	//
 	// the first argument is an integer from the sets {0, 1}
@@ -217,7 +197,6 @@ int main(int argc, char * * argv)
 
 	// check that we have an argument for the filename
 	// call the function to fill in the array	
-
         if (argc == 3) {
 	    array = read_in_Array(argv[2], &len); 
 	    printArray(array, len);
@@ -226,8 +205,7 @@ int main(int argc, char * * argv)
 	        return EXIT_FAILURE;
         }
 
-        // fill in the rest of the statements here
-        // so that the correct function is called based on the first argument
+        // calling a function based on the second argument
         if (atoi(argv[1]) == 0){
             return_value = largest_partial_sum(array, len);
         }
@@ -235,17 +213,11 @@ int main(int argc, char * * argv)
             return_value = largest_difference(array, len);
         }
 
+	    printf("\n\n%d\n", return_value);
 
-
-
-
-        // fill in the rest of the statements above this line
-
-	printf("\n\n%d\n", return_value);
-
-	if (array != NULL) {
-	   free(array);
-	}
+	    if (array != NULL) {
+	        free(array);
+	    }
     }
     return EXIT_SUCCESS;
 }

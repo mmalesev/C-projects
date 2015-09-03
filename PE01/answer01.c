@@ -1,15 +1,5 @@
 #include <stdlib.h>
 #include "answer01.h"
-/*checking if it works */
-/* Return the largest partial sum of the array */
-/* int array[] = { 1, 4, -1, 6, -5, 4} */
-/* the ith partial sum is the sum from array[0] through array[i] */
-/* the partial sums are 1, 5, 4, 10, 5, 9 */
-/* the largest partial sum of the array is 10 */
-/* if the len is 0, the largest partial sum is 0 */
-/* you may assume that array is NULL when len is 0 */
-/* but is non-NULL and correct when len is > 0 */
-/* you may also assume that none of the partial sums will cause an overflow */
 
 int largest_partial_sum(int * array, int len)
 {
@@ -17,6 +7,7 @@ int largest_partial_sum(int * array, int len)
    int sum;
    int i;
 
+   //if array has 0 elements max_sum is 0, otherwise we calculate it
    if (len == 0){
        max_sum = 0;
    }
@@ -34,15 +25,6 @@ int largest_partial_sum(int * array, int len)
    return max_sum;
 }
 
-/* Return the largest difference of the array */
-/* int array[] = { 1, 4, -1, 6, -5, 4} */
-/* the largest difference is 6 - (-5) = 11 */
-/* if the len is 0, the largest difference is 0 */
-/* if the len is 1, the largest difference is also 0 */
-/* you may assume that array is NULL when len is 0 */
-/* but is non-NULL and correct when len is > 0 */
-/* you may assume that the largest difference will not cause an overflow */
-
 int largest_difference(int * array, int len)
 {
    int max_diff;
@@ -54,6 +36,7 @@ int largest_difference(int * array, int len)
        max_diff = 0;
    }
    else{
+       //finding max and min element of the array
        max = array[0];
        min = array[0];
        for (i = 1; i < len; ++i){
