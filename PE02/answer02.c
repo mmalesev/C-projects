@@ -12,22 +12,22 @@
 //
 int char_to_int(char c)
 {
-   // what if c is '0'--'9'
+   int ret_value;
 
+   if (c >= 48 && c <= 57){
+       ret_value = c % 48;
+   }
+   else if (c >= 97 && c <= 122){
+       ret_value = c % 97 + 10;
+   }
+   else if (c >= 65 && c <= 90){
+       ret_value = c % 65 + 10;
+   }
+   else {
+       return INV_SYMBOL;
+   }
 
-
-   // what if c is 'a'--'z'
-
-
-
-   // what if c is 'A'--'Z'
-
-
-
-
-   // otherwise
-
-   return INV_SYMBOL;
+   return ret_value;
 }
 
 // you are not allowed to change the contents at the location whose address in 
@@ -56,59 +56,47 @@ long int str_to_long_int(const char *nptr, int base)
 {
    long int ret_value = 0;  // return value
                             // if no conversion happens, return 0
-
+   int ct = 0;
+   int sign = 1;
+   int conv_num;
+   int valid = 1;
    // if invalid base, set errno and return immediately
-
-
-
-
-
+   if (base < 2 || base > 36){
+       errno = EINVAL;
+       return 0;
+   }
    // valid base, skip over white space, white space includes tabs,
    // carriage return, etc (see function isspace).
-
-
-
-
-
+   do{
+       if(isspace(nptr[ct])){
+           ct++;
+       }
+   } while(isspace(nptr[ct]));
+   
    // if encounter a sign, expect a number after that 
    // if a negative sign is encountered, the conversion must
    // produce a negative number
-
-
-
-
-
-
-
+   if(nptr[ct] == '-'){
+       sign = -1;
+       ct++;
+   }
+   else if(nptr[ct] == '+'){
+       ct++;
+   }
 
    // now, convert the string to number
    // the conversion has to account for the +/- sign
+   do{
+       conv_num = char_to_int(nptr[ct++]); 
+       if (nptr[ct - 1] == 0 || conv_num >= base){
+           valid = 0;
+       }
+       else{
+           ret_value = ret_value * base + conv_num;
+       }
+   } while (valid == 1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   ret_value = ret_value * sign;
 
    return ret_value;
 }

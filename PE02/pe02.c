@@ -6,18 +6,19 @@
 
 // an incomplete test function to call char_to_int
 //
-void test_char_to_int()
+void test_char_to_int(char c)
 {
-    printf("%d\n", char_to_int('9'));
-    printf("%d\n", char_to_int('z'));
-    printf("%d\n", char_to_int('Z'));
+    printf("%d\n", char_to_int(c));
+    //printf("%d\n", char_to_int('z'));
+    //printf("%d\n", char_to_int('Z'));
 }
 
 // an incomplete test function to call test_str_to_long_int
 //
 void test_str_to_long_int()
 {
-    int base; 
+    int base;
+    char test_str[] = " ";
 
     // test for a range of base, including an invalid base 37
     // should also test whether the string has been changed
@@ -28,7 +29,7 @@ void test_str_to_long_int()
        // set errno to zero
 
        errno = 0;
-       long int test = str_to_long_int("     +a", base);
+       long int test = str_to_long_int(test_str, base);
 
        // print errno
        // typically, you want to check errno when the returned value
@@ -42,7 +43,7 @@ void test_str_to_long_int()
        // set errno to zero
 
        errno = 0;
-       test = strtol("     +a", NULL, base);
+       test = strtol(test_str, NULL, base);
        printf("%ld %d\n", test, errno);
     }
 
@@ -51,16 +52,14 @@ void test_str_to_long_int()
 int main(int argc, char * * argv)
 {
     printf("Welcome to ECE264, we are working on PE02.\n\n");
-
+    test_str_to_long_int();
     // testing the char_to_int function
     // question:  how to do a comprehensive test
-
-    test_char_to_int();
 
     // testing the str_to_long_int function
     // question:  how to do a comprehensive test
 
-    test_str_to_long_int();
+    //test_str_to_long_int();
 
     return EXIT_SUCCESS;
 }
