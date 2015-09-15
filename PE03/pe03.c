@@ -22,7 +22,7 @@ void test_str_to_long_int()
        // set errno to zero
 
        errno = 0;
-       long int test = str_to_long_int("     -8000000000000000", base);
+       long int test = str_to_long_int("232143219223372036854775807", base);
 
        // print errno
        // typically, you want to check errno when the returned value
@@ -36,8 +36,8 @@ void test_str_to_long_int()
        // set errno to zero
 
        errno = 0;
-       test = strtol("     -8000000000000000", &endptr, base);
-       printf("%ld :%s %d\n", test, endptr, errno);
+       test = strtol("232143219223372036854775807", &endptr, base);
+       printf("%ld :%s %d\n\n", test, endptr, errno);
     }
 }
 
