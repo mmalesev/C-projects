@@ -20,6 +20,7 @@
 
 int char_to_int(char);
 
+//character to integer conversion
 int char_to_int(char c)
 {
    int ret_value;
@@ -71,30 +72,8 @@ long int my_strtol(const char *nptr, char **endptr, int base)
    else if(nptr[ct] == '+'){
        ct++;
    }
-
-   // the exact algorithm is not given, but these are 
-   // the tasks the function has to perform:  
-   //
-   // determine the actual base if the base is 0
-   // if it starts with '0', it is octal
-   // if '0' is followed by 'x' or 'X' it is hexadecimal or base 16
-   // otherwise, it is decimal
-   // therefore you have to determine the actual base and the starting
-   // location to perform conversion
-   //
-   // for bases 2 to 15, perform conversion as in PE02
-   //
-   // for base 16, you have to decide when the conversion should
-   // start: after the optional "0x" or "0X" or immediately
-   // question: if you have "0xG", what should be converted?
-   //
-   // for bases 17 to 36, perform conversion as in PE02
-   // 
-   // after you have determine the real base, and where to start,
-   // perform the conversion
    
-   //conversion
-   if(base == 0){
+   if(base == 0){ //solving for the specific cases of base 0
        if(nptr[ct] == '0'){
            ct++;
 
@@ -112,12 +91,14 @@ long int my_strtol(const char *nptr, char **endptr, int base)
        }
    }
 
+   //special case for base 16
    if(base == 16){
        if(nptr[ct] == '0' && (nptr[ct+1] == 'x' || nptr[ct+1] == 'X')){
            ct = ct + 2;
        }
    }
 
+   //conversion
    do{
        conv_num = char_to_int(nptr[ct]); 
        if (nptr[ct] == 0 || conv_num >= base){
