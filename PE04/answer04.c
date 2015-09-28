@@ -4,6 +4,17 @@
 #include "answer04.h"
 
 // do not modify before this line
+char int_to_char(int);
+
+char int_to_char(int number)
+{
+    if(number < 10){
+        return(48 + number);
+    }
+    else{
+        return(65 - 10 + number);
+    }
+}
 
 // recursive implementation of the conversion of
 // the magnitude of a given number to a string
@@ -17,19 +28,23 @@ void rec_magnitude_long_int_to_string(long int number, int base,
 
    Increment_counter(&number);
 
-   // put your code here
+   char x; 
 
+   if(number > 0 && number >= base){ //recursive call for positive numbers
+       rec_magnitude_long_int_to_string(number/base, base, intstring, stringlen);
+   }
+   else if (number < 0 && number <= (-1) * base){ //recursive call for negative numbers
+       rec_magnitude_long_int_to_string(number/base, base, intstring, stringlen);
+   }
 
-
-
-
-
-
-
-
-
-
-
+   if(number <= 0){
+       x = int_to_char((int)((-1) * (number % base)));
+   }
+   else{
+       x = int_to_char((int)((number) % base));
+   }
+   intstring[*stringlen] = x;
+   *stringlen += 1;
 
    // decrement the counter after all recursive calls and before
    // you exit from this function
@@ -50,6 +65,7 @@ char *long_int_to_string(long int number, int base)
       errno = EINVAL;
       return NULL;
    }
+
    if (number < 0) {
       intstring[0] = '-';
       // place the number at location 1 of intstring
