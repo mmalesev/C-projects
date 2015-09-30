@@ -18,7 +18,7 @@ void test_char_to_int(char c)
 void test_str_to_long_int()
 {
     int base;
-    char test_str[] = " ";
+    char test_str[] = "10";
 
     // test for a range of base, including an invalid base 37
     // should also test whether the string has been changed

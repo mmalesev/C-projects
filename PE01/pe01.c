@@ -145,7 +145,6 @@ void test_largest_difference(int * array, int len, int expected)
 void test_01_largest_difference()
 {
     printf("Testing largest_difference(...)\n");
-    printf("\n");
 
     int array1[] = { -4, -1, 0, 1, 5, 10, 20, 21 };
     int len1 = 8;
@@ -166,6 +165,8 @@ void test_01_largest_difference()
     int array5[] = { -1, 13, 0, 0, -2, -3, -4 };
     int len5 = 7;
     test_largest_difference(array5, len5, 17);
+    
+    printf("\n");
 }
 
 int main(int argc, char * * argv)
