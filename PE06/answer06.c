@@ -10,13 +10,34 @@
 void Find_maze_dimensions(FILE *fptr, int *nrow, int *ncol)
 {
    *nrow = *ncol = 0;
+   fseek(fptr, 0, SEEK_SET);
+   int ch;
+   while((ch = fgetc(fptr)) != EOF){
+       if (ch == '\n'){
+           *nrow += 1;
+       }
+       else{
+           *ncol += 1;
+       }
+   }
+   *ncol /= *nrow;
 }
 
 /* Determine the column location of the top opening */
 
 int Find_opening_location(FILE *fptr)
 {
-   return 0;
+   int opening = -1; //if there is no opening the function will return -1
+   int ch;
+   int column = 0;
+   fseek(fptr, 0, SEEK_SET);
+   while((ch = fgetc(fptr)) != '\n'){
+       if (ch == ' '){
+           opening = column; 
+       }
+       column++;
+   }
+   return opening;
 }
 
 /* Count the number of locations with grass */
@@ -24,7 +45,15 @@ int Find_opening_location(FILE *fptr)
 
 int Count_grass_locations(FILE *fptr)
 {
-   return 0;
+   fseek(fptr, 0, SEEK_SET);
+   int grass = 0;
+   int ch;
+   while((ch = fgetc(fptr)) != EOF){
+       if (ch == ' '){
+           grass++;
+       }
+   }
+   return grass;
 }
 
 /* Return the type of location: CORN or GRASS, i.e. 'X' or ' ' */
@@ -35,7 +64,14 @@ int Count_grass_locations(FILE *fptr)
 /* You do not have to worry about the coordinates being out of range */
 
 char Get_location_type(FILE *fptr, int row, int col) {
-   return 0;   
+   fseek(fptr, 0, SEEK_SET);
+   int nrows;
+   int ncolumns;
+   char c;
+   Find_maze_dimensions(fptr, &nrows, &ncolumns);
+   fseek(fptr, row * (ncolumns + 1) + col, SEEK_SET);
+   c = (char)fgetc(fptr);
+   return c;   
 }
  
 /* Given a filename, re-represent the maze in the file pointer fptr */
@@ -46,5 +82,24 @@ char Get_location_type(FILE *fptr, int row, int col) {
 
 int Represent_maze_in_one_line(char *filename, FILE *fptr)
 {
-   return -1;
+   int counter = 0;
+   int ch;
+   fseek(fptr, 0, SEEK_SET);
+   FILE *newfptr = fopen(filename, "w");
+   
+   if (fptr == NULL){
+       fprintf(stderr, "Writing to the file %s failed\n", filename);
+       return -1;
+   }
+
+   while((ch = fgetc(fptr)) != EOF){
+       if (ch != '\n'){
+           fprintf(newfptr, "%c", ch);
+           counter++;
+       }
+   }
+   
+   fclose(newfptr);
+   
+   return counter;
 }
