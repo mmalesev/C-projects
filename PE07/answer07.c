@@ -4,7 +4,23 @@
 
 // if you want to declare and define new functions, put them here
 // or at the end of the file
+void Find_maze_dimensions(FILE *fptr, int *nrow, int *ncol);
 
+void Find_maze_dimensions(FILE *fptr, int *nrow, int *ncol)
+{
+   *nrow = *ncol = 0;
+   fseek(fptr, 0, SEEK_SET);
+   int ch;
+   while((ch = fgetc(fptr)) != EOF){
+       if (ch == '\n'){
+           *nrow += 1;
+       }
+       else{
+           *ncol += 1;
+       }
+   }
+   *ncol /= *nrow;
+}
 
 // do not remove #ifndef and #endif in this file, otherwise the evaluation
 // would fail and you would definitely get 0
@@ -20,7 +36,24 @@
 
 char **Allocate_maze_space(int nrow, int ncol)
 {
-   return NULL;
+   char **maze;
+   int i;
+   maze = (char **)malloc(sizeof(*maze) * nrow);
+   if(maze == NULL){
+       return NULL;
+   }
+   for(i = 0; i < nrow; i++){
+       maze[i] = (char *)malloc(sizeof(**maze) * ncol);
+       if(maze[i] == NULL){
+           int j;
+           for(j = 0; j < i; j++){
+               free(maze[j]);
+           }
+           free(maze);
+           return NULL;
+       }
+   }
+   return maze;
 }
 
 // free the memory used for the maze
@@ -28,7 +61,11 @@ char **Allocate_maze_space(int nrow, int ncol)
 
 void Deallocate_maze_space(char **maze, int nrow) 
 {
-   return;
+   int i;
+   for(i = 0; i < nrow; i++){
+       free(maze[i]);
+   }
+   free(maze);
 }
 
 #endif /* NTEST_MEM */
@@ -40,8 +77,23 @@ void Deallocate_maze_space(char **maze, int nrow)
 
 char **Read_maze_from_2Dfile(FILE *fptr, int *nrow, int *ncol)
 {
+   char **maze;
+   int i;
+   int j;
    *nrow = *ncol = 0;
-   return NULL;
+   Find_maze_dimensions(fptr, nrow, ncol);
+   fseek(fptr, 0, SEEK_SET);
+
+   maze = Allocate_maze_space(*nrow, *ncol);
+   
+   for(i = 0; i < *nrow; i++){
+       for(j = 0; j < *ncol; j++){
+           maze[i][j] = (char)fgetc(fptr);
+       }
+       fseek(fptr, 1, SEEK_CUR);  
+   }
+    
+   return maze;
 }
 
 #endif /* NTEST_READ */
@@ -53,7 +105,24 @@ char **Read_maze_from_2Dfile(FILE *fptr, int *nrow, int *ncol)
 
 int Write_maze_to_2Dfile(char *filename, char **maze, int nrow, int ncol) 
 {
-   return -1;
+   FILE *fptr = fopen(filename, "w");
+   if (fptr == NULL){
+       fprintf(stderr, "Writing to the file %s failed\n", filename);
+       return -1;
+   }
+   int counter = 0;
+   int i;
+   int j;
+   for(i = 0; i < nrow; i++){
+       for(j = 0; j < ncol; j++){
+           fprintf(fptr, "%c", maze[i][j]);
+           counter++;
+       }
+       fprintf(fptr, "%c", '\n');
+       counter++;
+   }
+   fclose(fptr);
+   return counter;
 }
 
 #endif /* NTEST_WRITE */
@@ -72,8 +141,31 @@ int Write_maze_to_2Dfile(char *filename, char **maze, int nrow, int ncol)
 
 char **Expand_maze_row(char **maze, int nrow, int ncol, int *rrow, int *rcol)
 {
-   *rrow = *rcol = 0;
-   return NULL;
+   char **exp_maze;
+   int i;
+   int j;
+   *rcol = ncol;
+   *rrow = 2 * nrow - 1;
+   
+   exp_maze = Allocate_maze_space(*rrow, *rcol);
+
+   if(exp_maze == NULL){
+       *rrow = 0;
+       *rcol = 0;
+       return NULL;
+   }
+
+   for(i = 0; i < *rrow; i++){
+       for(j = 0; j < *rcol; j++){
+           if(i < nrow){
+               exp_maze[i][j] = maze[i][j];
+           }
+           else{
+               exp_maze[i][j] = maze[(nrow - 1) - (i - nrow + 1)][j];
+           }
+       }
+   }
+   return exp_maze;
 }
 
 #endif /* NTEST_ROW */
@@ -100,8 +192,46 @@ char **Expand_maze_row(char **maze, int nrow, int ncol, int *rrow, int *rcol)
 
 char **Expand_maze_column(char **maze, int nrow, int ncol, int *crow, int *ccol)
 {
-   *crow = *ccol = 0;
-   return NULL;
+   char **exp_maze;
+   int i;
+   int j;
+   int offset = 0;
+   int valid = 0;
+   *ccol = 2 * ncol - 1;
+   *crow = nrow;
+   
+   exp_maze = Allocate_maze_space(*crow, *ccol);
+
+   if(exp_maze == NULL){
+       *crow = 0;
+       *ccol = 0;
+       return NULL;
+   }
+
+   for(i = 0; i < *crow; i++){
+       for(j = 0; j < *ccol; j++){
+           if(j < ncol){
+               exp_maze[i][j] = maze[i][j];
+           }
+           else{
+               exp_maze[i][j] = maze[i][(ncol - 1) - (j - ncol + 1)];
+           }
+       }
+   }
+
+   while(!valid){
+       if(exp_maze[*crow / 2 + 1][ncol - 1 - offset] != ' ' && exp_maze[*crow / 2 - 1][ncol - 1 - offset] != ' '){
+            exp_maze[*crow / 2][ncol - 1 - offset] = ' ';
+            exp_maze[*crow / 2][ncol - 1 + offset] = ' ';
+            offset++;
+       }
+       else{
+           exp_maze[*crow / 2][ncol - 1 - offset] = ' ';
+           exp_maze[*crow / 2][ncol - 1 + offset] = ' ';
+           valid = 1;
+       }
+   }
+   return exp_maze;
 }
 
 #endif /* NTEST_COL */
