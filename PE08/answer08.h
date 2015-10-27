@@ -6,7 +6,7 @@
 // clashing with functions declared and defined by instructors for
 // grading
 
-
+double **Allocate_matrix_space(int size);
 
 //
 // functions declared for PE08
