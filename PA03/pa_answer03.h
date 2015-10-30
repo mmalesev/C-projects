@@ -7,8 +7,8 @@
 
 // declare your functions here
 // do not start your function names with a prefix of two underscores "__"
-
-
+double **Allocate_matrix_space(int size);
+void Switch_rows(double **matrix, int i, int j, int size);
 // function that is declared and defined for you
 
 int Is_zero(double value);
