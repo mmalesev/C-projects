@@ -17,28 +17,28 @@ int main(int argc, char **argv){
   int top_y = INT_MAX;
   for(i = 1; i < argc - 1; i++){
     if(strcmp(argv[i], "-l") == 0){
-      if((strcmp(argv[i + 1], "-r") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-t") == 0)){
+      if((strcmp(argv[i + 1], "-r") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-t") == 0) || (strcmp(argv[i + 1], "-l") == 0)){
         fprintf(stderr, "Invalid arguments\n");
         return EXIT_FAILURE;
       }
       left_x = atoi(argv[++i]);
     }
     if(strcmp(argv[i], "-r") == 0){
-      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-t") == 0)){
+      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-t") == 0) || (strcmp(argv[i + 1], "-r") == 0)){
         fprintf(stderr, "Invalid arguments\n");
         return EXIT_FAILURE;
       }
       right_x = atoi(argv[++i]);
     }
     if(strcmp(argv[i], "-b") == 0){
-      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-r") == 0) || (strcmp(argv[i + 1], "-t") == 0)){
+      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-r") == 0) || (strcmp(argv[i + 1], "-t") == 0) || (strcmp(argv[i + 1], "-b") == 0)){
         fprintf(stderr, "Invalid arguments\n");
         return EXIT_FAILURE;
       }
       bottom_y = atoi(argv[++i]);
     }
     if(strcmp(argv[i], "-t") == 0){
-      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-r") == 0)){
+      if((strcmp(argv[i + 1], "-l") == 0) || (strcmp(argv[i + 1], "-b") == 0) || (strcmp(argv[i + 1], "-r") == 0) || (strcmp(argv[i + 1], "-t") == 0)){
         fprintf(stderr, "Invalid arguments\n");
         return EXIT_FAILURE;
       }
