@@ -204,6 +204,7 @@ BMP_Image *Crop_BMP_Image(BMP_Image *image, int left_x,
      top_y = image->header.height - 1;
    }
 
+   printf("l %d, r %d, b %d, t %d", left_x, right_x, bottom_y, top_y);
    // proceed only if left_x <= right_x and bottom_y <= top_y
    if(left_x > right_x || bottom_y > top_y){
      return NULL;
@@ -238,17 +239,8 @@ BMP_Image *Crop_BMP_Image(BMP_Image *image, int left_x,
    if(t_image->data == NULL){
      return NULL;
    }
-   /*int im_padding;
-   if(image->header.bits == 24){
-     im_padding = (4 - ((image->header.width * 3) % 4)) % 4;
-   }
-   else{
-     im_padding = image->header.width % 2 * 2;
-   }*/
    int i, j, p;
    long int counter = 0;
-   //int im_row = image->header.height;
-   //int im_col = image->header.width;
    int n;
    if(t_image->header.bits == 24){
      n = 3;
@@ -258,7 +250,7 @@ BMP_Image *Crop_BMP_Image(BMP_Image *image, int left_x,
    }
    for(i = 0; i < height; i++){
      for(j = 0; j < width * n; j++){
-       t_image->data[counter] = image->data[(i + bottom_y) * (image->header.imagesize / image->header.height) + j + left_x];
+       t_image->data[counter] = image->data[(i + bottom_y) * (image->header.imagesize / image->header.height) + j + left_x * n];
        counter++;
      }
      for(p = 0; p < padding; p++){
