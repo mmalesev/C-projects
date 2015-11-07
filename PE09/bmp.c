@@ -204,7 +204,6 @@ BMP_Image *Crop_BMP_Image(BMP_Image *image, int left_x,
      top_y = image->header.height - 1;
    }
 
-   printf("l %d, r %d, b %d, t %d", left_x, right_x, bottom_y, top_y);
    // proceed only if left_x <= right_x and bottom_y <= top_y
    if(left_x > right_x || bottom_y > top_y){
      return NULL;
