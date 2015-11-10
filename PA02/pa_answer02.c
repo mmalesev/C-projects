@@ -47,18 +47,31 @@ void Get_mowing_directions(char *mazefile, char *directionfile){
    FILE *fptr_maze = fopen(mazefile, "r");
    if (fptr_maze == NULL){
        fprintf(stderr, "Opening the file %s failed\n", mazefile);
+       return;
    }
 
    FILE *fptr_dir = fopen(directionfile, "w");
+   if (fptr_dir == NULL){
+       fclose(fptr_maze);
+       fprintf(stderr, "Opening the file %s failed\n", directionfile);
+       return;
+   }
 
    int maze_r;
    int maze_c;
    char **maze;
    int row = 0;
-   int opening = Find_opening_location(fptr_maze);
-   int col = opening;
+   int col = Find_opening_location(fptr_maze);
+   if(col == -1){
+      fprintf(stderr, "Incorrect maze - no opening\n");
+      return;
+   }
 
    maze = Read_maze_from_2Dfile(fptr_maze, &maze_r, &maze_c);
+   if(maze == NULL){
+      return;
+   }
+
    maze[row][col] = '.';
    Find_direction(fptr_dir, maze, row, col, maze_r, maze_c);
 
@@ -89,8 +102,8 @@ int Simulate_mowing(char *mazefile, char *directionfile, char *mowedfile){
    int legal = 1;
    int row = 0;
    int col = Find_opening_location(fptr_maze);
-   int opening = col;
    int grass = Count_grass_locations(fptr_maze);
+   int opening = col;
 
    maze = Read_maze_from_2Dfile(fptr_maze, &maze_r, &maze_c);
    
@@ -143,17 +156,18 @@ int Simulate_mowing(char *mazefile, char *directionfile, char *mowedfile){
 
 int Find_opening_location(FILE *fptr)
 {
-   int opening = -1; //if there is no opening the function will return -1
+   int opening; //if there is no opening the function will return -1
    int ch;
    int column = 0;
    fseek(fptr, 0, SEEK_SET);
    while((ch = fgetc(fptr)) != '\n'){
        if (ch == ' '){
            opening = column; 
+           return opening;
        }
        column++;
    }
-   return opening;
+   return -1;
 }
 
 void Write_maze_to_2Dfile(char *filename, char **maze, int nrow, int ncol) 
@@ -183,6 +197,10 @@ char **Read_maze_from_2Dfile(FILE *fptr, int *nrow, int *ncol)
    fseek(fptr, 0, SEEK_SET);
 
    maze = Allocate_maze_space(*nrow, *ncol);
+   if(maze == NULL){
+      fprintf(stderr, "Space for the maze could not be allocated\n");
+      return NULL;
+   }
    
    for(i = 0; i < *nrow; i++){
        for(j = 0; j < *ncol; j++){

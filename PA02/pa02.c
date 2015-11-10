@@ -20,6 +20,7 @@ int main(int argc, char **argv){
            printf("%d\n", status);
        }
        else{
+           fprintf(stderr, "Wrong number of arguments supplied\n");
            return EXIT_FAILURE;
        }
    }
@@ -31,10 +32,12 @@ int main(int argc, char **argv){
            Get_mowing_directions(mazefile, directionfile);
        }
        else{
+           fprintf(stderr, "Wrong number of arguments supplied\n");
            return EXIT_FAILURE;
        }
    }
    else{
+       fprintf(stderr, "Wrong number of arguments supplied\n");
        return EXIT_FAILURE;
    }
 
