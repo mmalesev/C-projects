@@ -36,24 +36,25 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
     int counter = 0;
     int pixel_error;
     int temp;
+    int d_row = image->header.width * 3 + im_padding;
     for(i = conv_image->header.height - 1; i >= 0; i--){
         counter = 0;
         for(j = 0; j < conv_image->header.width * 3; j++){
-            color = image->data[i * (image->header.width * 3 + im_padding) + j];
+            color = image->data[i * d_row + j];
             pixel_error = quant_error(color);
             if(j < conv_image->header.width * 3 - 3){
-                q_error[i * (image->header.width * 3 + im_padding) + j + 3] += 7 * pixel_error; 
+                q_error[i * d_row + j + 3] += 7 * pixel_error; 
             }
             if(j < conv_image->header.width * 3 - 3 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j + 3] += pixel_error; 
+                q_error[(i - 1) * d_row + j + 3] += pixel_error; 
             }
             if(i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j] += 5 * pixel_error; 
+                q_error[(i - 1) * d_row + j] += 5 * pixel_error; 
             }
             if(j > 2 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j - 3] += 3 * pixel_error; 
+                q_error[(i - 1) * d_row + j - 3] += 3 * pixel_error; 
             }
-            temp = (int)color + q_error[i * (image->header.width * 3 + im_padding) + j] / 16;
+            temp = (int)color + q_error[i * d_row + j] / 16;
             if(temp < 0){
                 color = 0;
             }
@@ -61,7 +62,7 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
                 color = 255;
             }
             else{
-                color += (unsigned char)(q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0);
+                color += (unsigned char)(q_error[i * d_row + j] / 16.0);
             }
 
             color >>= 3;
@@ -70,18 +71,18 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
             color = image->data[i * (image->header.width * 3 + im_padding) + j];
             pixel_error = quant_error(color);
             if(j < conv_image->header.width * 3 - 3){
-                q_error[i * (image->header.width * 3 + im_padding) + j + 3] += 7 * pixel_error; 
+                q_error[i * d_row + j + 3] += 7 * pixel_error; 
             }
             if(j < conv_image->header.width * 3 - 3 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j + 3] += pixel_error; 
+                q_error[(i - 1) * d_row + j + 3] += pixel_error; 
             }
             if(i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j] += 5 * pixel_error; 
+                q_error[(i - 1) * d_row + j] += 5 * pixel_error; 
             }
             if(j > 2 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j - 3] += 3 * pixel_error; 
+                q_error[(i - 1) * d_row + j - 3] += 3 * pixel_error; 
             }
-            temp = (unsigned int)color + q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0;
+            temp = (unsigned int)color + q_error[i * d_row + j] / 16.0;
             if(temp < 0){
                 color = 0;
             }
@@ -89,26 +90,26 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
                 color = 255;
             }
             else{
-                color += (unsigned char)(q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0);
+                color += (unsigned char)(q_error[i * d_row + j] / 16.0);
             }
             color >>= 3;
             RGB = RGB | (color << GREEN_BIT);
             j++;
             color = image->data[i * (image->header.width * 3 + im_padding) + j];
             pixel_error = quant_error(color);
-            if(j < conv_image->header.width * 3 - 3){
-                q_error[i * (image->header.width * 3 + im_padding) + j + 3] += 7 * pixel_error; 
+            if(j <= conv_image->header.width * 3 - 3){
+                q_error[i * d_row + j + 3] += 7 * pixel_error; 
             }
-            if(j < conv_image->header.width * 3 - 3 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j + 3] += pixel_error; 
+            if(j <= conv_image->header.width * 3 - 3 && i > 0){
+                q_error[(i - 1) * d_row + j + 3] += pixel_error; 
             }
             if(i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j] += 5 * pixel_error; 
+                q_error[(i - 1) * d_row + j] += 5 * pixel_error; 
             }
             if(j > 2 && i > 0){
-                q_error[(i - 1) * (image->header.width * 3 + im_padding) + j - 3] += 3 * pixel_error; 
+                q_error[(i - 1) * d_row + j - 3] += 3 * pixel_error; 
             }
-            temp = (int)color + q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0;
+            temp = (int)color + q_error[i * d_row + j] / 16.0;
             if(temp < 0){
                 color = 0;
             }
@@ -116,7 +117,7 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
                 color = 255;
             }
             else{
-                color += (unsigned char)(q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0);
+                color += (unsigned char)(q_error[i * d_row + j] / 16.0);
             }
             color >>= 3;
             RGB = RGB | (color << RED_BIT);
