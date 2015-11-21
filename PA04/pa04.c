@@ -26,14 +26,9 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
       }
       BMP_Image *c_image;
-      BMP_Image *new_image;
       if(image->header.bits == 24){
-          c_image = Convert_24_to_16_BMP_Image(image);
-          new_image = Convert_24_to_16_BMP_Image_with_Dithering(image);
+          c_image = Convert_24_to_16_BMP_Image_with_Dithering(image);
           if(c_image == NULL){
-              return EXIT_FAILURE;
-          }
-          if(new_image == NULL){
               return EXIT_FAILURE;
           }
       }
@@ -44,10 +39,12 @@ int main(int argc, char **argv){
           }
       }
 
-      FILE *fptrn = fopen("new_image.bmp", "w");
       int status = Write_BMP_Image(fptrw, c_image);
-      int new_status = Write_BMP_Image(fptrn, new_image);
-      printf("%d", new_status);
+      fclose(fptr);
+      fclose(fptrw);
+      Free_BMP_Image(image);
+      Free_BMP_Image(c_image);
+
       if(status == TRUE){
           return EXIT_SUCCESS;
       }

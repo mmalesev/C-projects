@@ -81,7 +81,7 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
             if(j > 2 && i > 0){
                 q_error[(i - 1) * (image->header.width * 3 + im_padding) + j - 3] += 3 * pixel_error; 
             }
-            temp = (int)color + q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0;
+            temp = (unsigned int)color + q_error[i * (image->header.width * 3 + im_padding) + j] / 16.0;
             if(temp < 0){
                 color = 0;
             }
@@ -122,84 +122,12 @@ BMP_Image *Convert_24_to_16_BMP_Image_with_Dithering(BMP_Image *image){
             RGB = RGB | (color << RED_BIT);
             sconv_image[i * (image->header.width + padding) + counter] = RGB;
             counter++;
-
-            /*q_error = 0;
-            color = image->data[i * (image->header.width * 3 + im_padding) + j];
-            if(j < conv_image->header.width * 3 - 3 && i != conv_image->header.height - 1){
-                q_error += 3 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j + 3]); 
-            }
-            if(i != conv_image->header.height - 1){
-                q_error += 5 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j]); 
-            }
-            if(j > 2 && i != conv_image->header.height - 1){
-                q_error += quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            if(j > 2){
-                q_error += 7 * quant_error(conv_image->data[i * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            color += q_error / 16;
-            if(color < 0){
-                color = 0;
-            }
-            if(color > 255){
-                color = 255;
-            }
-            color >>= 3;
-            RGB = color << BLUE_BIT; 
-            j++;
-            q_error = 0;
-            color = image->data[i * (image->header.width * 3 + im_padding) + j];
-            if(j < conv_image->header.width * 3 - 2 && i != conv_image->header.height - 1){
-                q_error += 3 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j + 3]); 
-            }
-            if(i != conv_image->header.height - 1){
-                q_error += 5 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j]); 
-            }
-            if(j > 2 && i != conv_image->header.height - 1){
-                q_error += quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            if(j > 2){
-                q_error += 7 * quant_error(conv_image->data[i * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            color += q_error / 16;
-            if(color < 0){
-                color = 0;
-            }
-            if(color > 255){
-                color = 255;
-            }
-            color >>= 3;
-            RGB = RGB | (color << GREEN_BIT);
-            j++;
-            color = image->data[i * (image->header.width * 3 + im_padding) + j];
-            q_error = 0;
-            if(j < conv_image->header.width * 3 - 1 && i != conv_image->header.height - 1){
-                q_error += 3 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j + 3]); 
-            }
-            if(i != conv_image->header.height - 1){
-                q_error += 5 * quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j]); 
-            }
-            if(j > 2 && i != conv_image->header.height - 1){
-                q_error += quant_error(conv_image->data[(i + 1) * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            if(j > 2){
-                q_error += 7 * quant_error(conv_image->data[i * (image->header.width * 3 + im_padding) + j - 3]); 
-            }
-            color += q_error / 16;
-            if(color < 0){
-                color = 0;
-            }
-            if(color > 255){
-                color = 255;
-            }
-            color >>= 3;
-            RGB = RGB | (color << RED_BIT);
-            sconv_image[counter++] = RGB;*/
         }
         for(j=0; j<padding; j++){
             sconv_image[counter++] = 0;
         }
     }
+    free(q_error);
     return conv_image;
 }
 
