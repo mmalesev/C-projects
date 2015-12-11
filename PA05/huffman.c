@@ -25,41 +25,103 @@ tnode *Build_huffman_tree(FILE *infptr)
    // First unsigned int in the file is the file size
    // second unsigned int is the header size
    // third unsigned int is the number of characters in the original file
-
-
+   fseek(infptr, 0, SEEK_SET);
+   unsigned int file_size;
+   int check;
+   check = fread(&file_size, sizeof(int), 1, infptr);
+   if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return NULL;
+   }
+   unsigned int header_size;
+   check = fread(&header_size, sizeof(int), 1, infptr);
+   if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return NULL;
+   }
+   unsigned int original_size;
+   check = fread(&original_size, sizeof(int), 1, infptr);
+   if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return NULL;
+   }
 
    // initialize the stack, here, we have a dummy called stack
    // the code in list_tree.c assumes the presence of a dummy
    // the size of the stack is 0
 
-   lnode stack;
-   stack.next = NULL;
-   set_stack_size(&stack, 0);
+   lnode stack_x;
+   stack_x.next = NULL;
+   set_stack_size(&stack_x, 0);
 
-   int token;  // token to be read from the infptr
+   unsigned char token;  // token to be read from the infptr
 
    // while we are in the header region
    // break from the loop when you cannot continue to build a tree
    // e.g. encountering EOF, asked to build a tree from two trees
    // on the stack, but the stack contains 0 or 1 tree.
-
-   while (1) { // replace if necessary the correct condition
-      token = fgetc(infptr); // get a character from the infptr
-      if (token == '1') {
+   int bit_counter = 8;
+   int char_counter = 0;
+   unsigned char character;
+   unsigned char mask;
+   int ones = 0;
+   int zeros = 0;
+   int i;
+   while (char_counter < header_size || ones != zeros) { // replace if necessary the correct condition
+      if(bit_counter == 8){
+          character = fgetc(infptr); // get a character from the infptr
+          if(character == EOF || character < 0 || character > ASCII_COUNT){
+              fprintf(stderr, "The file is corrupted\n");
+              stack_flush(&stack_x);
+              return NULL;
+          }
+          bit_counter = 0;
+          char_counter++;
+      }
+      mask = 1 << (7 - bit_counter);
+      token = character & mask;
+      if(token != 0){
+          token /= token;
+      }
+      bit_counter++;
+      if (token == 1) {
 	// what follows should be a character
         // read the character
         // build a tree that has a single tree node for that character
         // construct a list node with that tree node
         // push the list node onto the stack
+        token = 0;
+        ones++;
+        unsigned char temp_char;
+        for(i = 0; i < 8; i++){
+            if(bit_counter == 8){
+               character = fgetc(infptr); // get a character from the infptr
+               if(character == EOF || character < 0 || character > ASCII_COUNT){
+                   fprintf(stderr, "The file is corrupted\n");
+                   stack_flush(&stack_x);
+                   return NULL;
+                }
+                bit_counter = 0;
+                char_counter++;
+            }
+            mask = 1 << (7 - bit_counter);
+            temp_char = character & mask;
+            if(temp_char != 0){
+                temp_char /= temp_char;
+            }
+            temp_char = temp_char << (7 - i);
+            token = token | temp_char;
+            bit_counter++;
+        }
+        tnode *new_char;
+        new_char = malloc(sizeof(*new_char));
+        new_char->value = (int)token;
+        new_char->left = NULL;
+        new_char->right = NULL;
 
-
-
-
-
-
-
-      
-      } else if (token == '0') {  
+        lnode *new_node = node_construct(new_char);
+        push(&stack_x, new_node);
+      } else if (token == 0) {  
          // You have to build a bigger tree from two trees in the list nodes
          // popped from the stack
          // After that, you have to push a list node containing the bigger
@@ -69,9 +131,29 @@ tnode *Build_huffman_tree(FILE *infptr)
          // (2) which of the two trees popped from the stack
          // is left and which is right of the bigger tree
          // (3) cleaning up so that you do not leak memory
-         
+         zeros++;
+         if(zeros > ones){
+             stack_flush(&stack_x);
+             fprintf(stderr, "File is corrupted\n");
+             return NULL;
+         }
+
+         if(stack_size(&stack_x) >= 2){
+             tnode *new_tree;
+             new_tree = malloc(sizeof(*new_tree));
+             lnode *right_node = pop(&stack_x);
+             lnode *left_node = pop(&stack_x);
+             new_tree->left = left_node->tree;
+             new_tree->right = right_node->tree;
+             free(left_node);
+             free(right_node);
+             lnode *new_node = node_construct(new_tree);
+             push(&stack_x, new_node);
+         }
       } else {
-         break;
+         fprintf(stderr, "File is corrupted\n");
+         stack_flush(&stack_x);
+         return NULL;
       }
    }
 
@@ -83,9 +165,30 @@ tnode *Build_huffman_tree(FILE *infptr)
    // only list node on the stack, get it, and return the constructed tree
    // otherwise, return NULL
    // always clean up memory to avoid memory leak
-
-   stack_flush(&stack);
-   return NULL;
+   /*
+   while(stack_size(&stack_x) != 1){
+             tnode *new_tree;
+             new_tree = malloc(sizeof(*new_tree));
+             lnode *right_node = pop(&stack_x);
+             lnode *left_node = pop(&stack_x);
+             new_tree->left = left_node->tree;
+             new_tree->right = right_node->tree;
+             free(left_node);
+             free(right_node);
+             lnode *new_node = node_construct(new_tree);
+             push(&stack_x, new_node);
+   }
+   */
+   if(stack_size(&stack_x) != 1){
+     fprintf(stderr, "File is corrupted");
+     stack_flush(&stack_x);
+     return NULL;
+   }
+   lnode *final_node = pop(&stack_x);
+   tnode *final_tree = final_node->tree;
+   free(final_node);
+   stack_flush(&stack_x);
+   return final_tree;
 }
 
 // if you successfully decode, return 1
@@ -98,80 +201,69 @@ tnode *Build_huffman_tree(FILE *infptr)
 // Even if decoding fails, whatever you have written into outfptr 
 // should remain.  You just have to return 0.
 //
-int Huffman_decoding(tnode *huffman, FILE *infptr, FILE *outfptr)
-{
-   // first you should get the number of characters to be decoded
-   // that number is the third unsigned int in the input file
-   // you have to advance beyond the header section to access
-   // the encoded data
 
-
-
-
-
-
-   // you should have a tnode *curr that is first initialized 
-   // to point to the root of the tree, i.e., huffman
-
-   tnode *curr = huffman;   
-
-   // now while the number of characters to be decoded 
-   // is greater than 0, you iterate
-
-   while (1) {  /* put in the right condition */
-      // if curr is a leaf node
-      // you have decoded one character
-      // you should print that character, and decrement the number
-      // of character to be decoded
-      // reset curr to point to huffman
-      if (is_leaf_node(curr)) {
-
-
-
-
-
-         curr = huffman; // restart
-      } else {
-         // decide on the next direction to go
-         // get the next bit from the input file (from most significant 
-         // position to the least significant in a byte) 
-         // however, you can only read in byte-by-byte from a file
-         // therefore, you probably need to have a variable to store
-         // a byte read from the file and a variable to store the 
-         // the position you are currently at in that byte
-         // whenever you finish processing a bit, you should update
-         // your position in the byte
-         // you have to think of when you have to read in a new byte
-         // and restart at the most significant position
-         // of course, if you encounter end of file while the 
-         // the number of characters to be decoded is still > 0, decoding
-         // should fail
-
-
-
-
-
-
-         // if next bit is 0, go left, otherwise, go right
-
-         int next_bit = 0; // you have to decide how to get the next bit
-         if (next_bit == 0) {
+int Huffman_decoding(tnode *huffman, FILE *infptr, FILE *outfptr){
+    fseek(infptr, 0, SEEK_SET);
+    unsigned int file_size;
+    int check;
+    check = fread(&file_size, sizeof(int), 1, infptr);
+    if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return 0;
+    }
+    unsigned int header_size;
+    check = fread(&header_size, sizeof(int), 1, infptr);
+    if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return 0;
+    }
+    unsigned int original_size;
+    check = fread(&original_size, sizeof(int), 1, infptr);
+    if(check != 1){
+       fprintf(stderr, "The file is corrupted\n");
+       return 0;
+    }
+    fseek(infptr, header_size, SEEK_CUR);
+    unsigned char mask = 1;
+    mask = mask << 7;
+    unsigned int direction;
+    tnode *curr = huffman;
+    char ch;
+    int j = 0;
+    int i = 0;
+    int counter = 0;
+    while(j < original_size){
+        if(counter == file_size - header_size - 3 * sizeof(int)){
+            fprintf(stderr, "The file is corrupted\n");
+            return 0;
+        }
+        if(i == 0){
+            ch = fgetc(infptr);
+        }
+        mask = 1 << (7 - i);
+        direction = mask & ch;
+        if(direction == 0){
             curr = curr->left;
-         } else {
+        }
+        else{
             curr = curr->right;
-         }
-      }
-   }
+        }
+        if(is_leaf_node(curr)){
+                fputc(curr->value, outfptr);
+                curr = huffman;
+                j++;
+        }
+        i++;
+        if(i == 8){
+            i = 0;
+            counter++;
+        }
+    }
+    fseek(infptr, 0, SEEK_END);
+    if(ftell(infptr) != file_size){
+        fprintf(stderr, "The file is corrupted\n");
+        return 0;
+    }
 
-   // clean up at the end
-   // have to decide whether you have successfully decoded 
-   // all characters specified by the third unsigned int in the input file
-   // decoded
-   // 
-   // if you want to check whether the input file has been corrupted
-   // 1.  check that no more characters left in the input file to be decoded
-   // 2.  all remaining bits in the char you are processing when you decoded
-   // the last character are 0
-
-   return 1;
+    return 1;
 }
