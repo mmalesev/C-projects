@@ -163,7 +163,6 @@ def find_difference(mode):
     changed_enc = BitVector(filename = "encrypted_modified.txt")
     diff_bits = 0
     if (mode == '0'):
-        print "not here"
         original = original_enc.read_bits_from_file( 64 )
         changed = changed_enc.read_bits_from_file( 64 )
         for i in range(64):
